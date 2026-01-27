@@ -1,0 +1,7 @@
+# Stable versions that work together
+torch==2.1.0
+torchaudio==2.1.0
+torchmetrics==1.2.0
+numpy==1.26.4
+tqdm
+soundfile

@@ -21,6 +21,12 @@ SP_CUP_Phase_2/
 │   ├── anechoic_Conformer.pth   # Pretrained model (anechoic)
 │   └── reverb_Conformer.pth     # Pretrained model (reverberant)
 │
+├── Test_Dataset/                # Test datasets (gitignored)
+│   ├── anechoic/                # Anechoic test samples
+│   └── reverb/                  # Reverberant test samples
+│
+├── requirements.txt             # Python dependencies
+├── .gitignore                   # Git ignore rules
 └── README.md                    # This file
 ```
 
@@ -30,15 +36,29 @@ SP_CUP_Phase_2/
 
 ### Python Dependencies
 
+Install all dependencies using the requirements file:
+
 ```bash
-pip install torch torchaudio torchmetrics numpy tqdm
+pip install -r requirements.txt
 ```
 
-- **Python** >= 3.8
-- **PyTorch** >= 1.10
-- **torchaudio** >= 0.10
-- **torchmetrics** (for evaluation metrics: PESQ, STOI, SI-SDR)
-- **numpy**, **tqdm**
+Or install manually with these **stable, tested versions**:
+
+```bash
+pip install torch==2.1.0 torchaudio==2.1.0 torchmetrics==1.2.0 numpy==1.26.4 tqdm soundfile
+```
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| Python | >= 3.8 | Tested with 3.10 |
+| torch | 2.1.0 | Stable PyTorch |
+| torchaudio | 2.1.0 | Audio I/O (avoid 2.10+ which requires torchcodec) |
+| torchmetrics | 1.2.0 | PESQ, STOI, SI-SDR metrics |
+| numpy | 1.26.4 | Numerical operations |
+| soundfile | latest | Fallback audio I/O |
+| tqdm | latest | Progress bars |
+
+> ⚠️ **Note:** Avoid torchaudio >= 2.6.0 as it requires `torchcodec` which has compatibility issues.
 
 ### MATLAB (for dataset generation)
 
@@ -192,17 +212,24 @@ python inference_Conformer.py -i stereo_mix.wav -a 90 -o extracted.wav -d cuda
 # 1. Clone/navigate to the repo
 cd SP_CUP_Phase_2
 
-# 2. Install dependencies
-pip install torch torchaudio torchmetrics numpy tqdm
+# 2. (Recommended) Create virtual environment
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
 
-# 3. Run inference with pretrained model
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run inference with pretrained model
 cd "Model Inference"
 python inference_Conformer.py -i your_audio.wav -a 45 -o output.wav -m reverb_Conformer.pth
 
-# 4. (Optional) Evaluate on test set
+# 5. (Optional) Evaluate on test set
 python test_Conformer.py
 
-# 5. (Optional) Train your own model
+# 6. (Optional) Train your own model
 python train_Conformer.py
 ```
 

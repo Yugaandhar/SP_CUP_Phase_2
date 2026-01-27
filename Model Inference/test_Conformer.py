@@ -360,15 +360,7 @@ class DCCRNConformer(nn.Module):
 # 5. UTILITY FUNCTIONS
 # ==========================================
 def load_audio(path, target_len=None):
-    # Use soundfile directly to avoid TorchCodec dependency in torchaudio v2.10+
-    data, sr = sf.read(path, dtype='float32')
-    # Convert to torch tensor and add channel dimension if needed
-    waveform = torch.from_numpy(data)
-    if waveform.dim() == 1:
-        waveform = waveform.unsqueeze(0)  # [samples] -> [1, samples]
-    else:
-        waveform = waveform.T  # [samples, channels] -> [channels, samples]
-    
+    waveform, sr = torchaudio.load(path)
     if sr != SAMPLE_RATE:
         resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
         waveform = resampler(waveform)
