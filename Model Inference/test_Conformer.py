@@ -6,7 +6,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchaudio
 import numpy as np
-from torchmetrics.audio import ShortTimeObjectiveIntelligibility, PerceptualEvaluationSpeechQuality, ScaleInvariantSignalDistortionRatio
+from torchmetrics.audio.stoi import ShortTimeObjectiveIntelligibility
+from torchmetrics.audio.pesq import PerceptualEvaluationSpeechQuality
+from torchmetrics.audio.sdr import ScaleInvariantSignalDistortionRatio
 from tqdm import tqdm
 import time
 import math
@@ -21,7 +23,7 @@ OUTPUT_DIR = "evaluation_anechoic"   # or evaluations_anechoic
 SAMPLE_RATE = 16000
 N_FFT = 512
 HOP_LENGTH = 128
-DEVICE = torch.device("cpu")
+DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 # ==========================================
 # 2. MODEL COMPONENTS
@@ -360,7 +362,8 @@ class DCCRNConformer(nn.Module):
 # 5. UTILITY FUNCTIONS
 # ==========================================
 def load_audio(path, target_len=None):
-    waveform, sr = torchaudio.load(path)
+    # Use soundfile backend to avoid torchcodec dependency in torchaudio 2.10+
+    waveform, sr = torchaudio.load(path, backend="soundfile")
     if sr != SAMPLE_RATE:
         resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
         waveform = resampler(waveform)
@@ -525,8 +528,6 @@ def run_evaluation():
 
     # Category-based best samples
     categories = [
-        ("BEST MALE", "Male", None),
-        ("BEST FEMALE", "Female", None),
         ("BEST MALE + NOISE", "Male", "Noise"),
         ("BEST MALE + MUSIC", "Male", "Music"),
         ("BEST MALE + FEMALE", "Male", "Female"),
@@ -565,6 +566,7 @@ def run_evaluation():
         folder = sample_folders[idx]
         mix_path = os.path.join(folder, "mixture.wav")
         target_path = os.path.join(folder, "target.wav")
+        interf_path = os.path.join(folder, "interferer.wav")
         meta_path = os.path.join(folder, "meta.json")
         
         try:
@@ -589,6 +591,14 @@ def run_evaluation():
                 torchaudio.save(os.path.join(OUTPUT_DIR, f"{prefix}_output.wav"), est_trim.cpu(), SAMPLE_RATE, backend="soundfile")
                 torchaudio.save(os.path.join(OUTPUT_DIR, f"{prefix}_mixture.wav"), mixture.squeeze(0).cpu(), SAMPLE_RATE, backend="soundfile")
                 torchaudio.save(os.path.join(OUTPUT_DIR, f"{prefix}_target.wav"), tgt_trim.cpu(), SAMPLE_RATE, backend="soundfile")
+                
+                # Save interference file if it exists
+                if os.path.exists(interf_path):
+                    interf = load_audio(interf_path)
+                    if interf.shape[0] > 1: interf = interf[0:1, :]
+                    interf_trim = interf[..., :min_len]
+                    torchaudio.save(os.path.join(OUTPUT_DIR, f"{prefix}_interferer.wav"), interf_trim.cpu(), SAMPLE_RATE, backend="soundfile")
+                
                 print(f"Saved {prefix} audio files to {OUTPUT_DIR}")
         except Exception as e:
             print(f"Error saving {prefix}: {e}")
@@ -598,12 +608,44 @@ def run_evaluation():
     save_best_sample(best_idx, "BEST_OVERALL")
 
     # Save Best Category Cases
+    category_results = {}
     for cat_name, src_filter, interf_filter in categories:
         cat_idx = find_best_in_category(src_filter, interf_filter)
         if cat_idx is not None:
             prefix = cat_name.replace(" ", "_").replace("+", "").upper()
             print(f"Saving {cat_name}: {sample_names[cat_idx]}...")
             save_best_sample(cat_idx, prefix)
+            category_results[cat_name] = {
+                "sample": sample_names[cat_idx],
+                "combined_score": float(combined_score[cat_idx]),
+                "sisdr": float(sisdr_arr[cat_idx]),
+                "stoi": float(stoi_arr[cat_idx]),
+                "pesq": float(pesq_arr[cat_idx])
+            }
+
+    # Save metrics to JSON
+    metrics_report = {
+        "total_samples": len(results['sisdr']),
+        "best_overall": {
+            "sample": best_sample_name,
+            "combined_score": float(combined_score[best_idx]),
+            "sisdr": float(best_sisdr),
+            "stoi": float(best_stoi),
+            "pesq": float(best_pesq)
+        },
+        "categories": category_results,
+        "inference_stats": {
+            "avg_inference_ms": float(avg_inference_time),
+            "std_inference_ms": float(std_inference_time),
+            "realtime_factor": float((3.0 * 1000) / avg_inference_time)
+        }
+    }
+    
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    metrics_path = os.path.join(OUTPUT_DIR, "metrics.json")
+    with open(metrics_path, 'w') as f:
+        json.dump(metrics_report, f, indent=2)
+    print(f"\nSaved metrics to {metrics_path}")
 
 if __name__ == "__main__":
     run_evaluation()

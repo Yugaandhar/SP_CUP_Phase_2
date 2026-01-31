@@ -23,7 +23,7 @@ N_FFT = 512
 HOP_LENGTH = 128
 SILENCE_PROB = 0.2
 NUM_WORKERS = 4
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 # Resume training from checkpoint (set to None to train from scratch)
 RESUME_FROM = "reverb_Conformer.pth"  # or None or anechoic_Conformer.pth

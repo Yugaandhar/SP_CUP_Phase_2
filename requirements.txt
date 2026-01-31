@@ -1,7 +1,9 @@
-# Stable versions that work together
-torch==2.1.0
-torchaudio==2.1.0
-torchmetrics==1.2.0
-numpy==1.26.4
+# Stable versions - avoiding torchcodec issues in torchaudio 2.10+
+torch==2.6.0
+torchaudio==2.6.0
+torchmetrics==1.8.2
+numpy==2.4.1
 tqdm
 soundfile
+pesq
+pystoi
