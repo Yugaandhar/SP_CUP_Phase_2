@@ -566,7 +566,8 @@ def run_evaluation():
         folder = sample_folders[idx]
         mix_path = os.path.join(folder, "mixture.wav")
         target_path = os.path.join(folder, "target.wav")
-        interf_path = os.path.join(folder, "interferer.wav")
+        # FIXED: Changed from "interferer.wav" to "interference.wav" to match MATLAB script
+        interf_path = os.path.join(folder, "interference.wav") 
         meta_path = os.path.join(folder, "meta.json")
         
         try:
@@ -597,7 +598,8 @@ def run_evaluation():
                     interf = load_audio(interf_path)
                     if interf.shape[0] > 1: interf = interf[0:1, :]
                     interf_trim = interf[..., :min_len]
-                    torchaudio.save(os.path.join(OUTPUT_DIR, f"{prefix}_interferer.wav"), interf_trim.cpu(), SAMPLE_RATE, backend="soundfile")
+                    # Saving as "{prefix}_interference.wav" for clarity
+                    torchaudio.save(os.path.join(OUTPUT_DIR, f"{prefix}_interference.wav"), interf_trim.cpu(), SAMPLE_RATE, backend="soundfile")
                 
                 print(f"Saved {prefix} audio files to {OUTPUT_DIR}")
         except Exception as e:

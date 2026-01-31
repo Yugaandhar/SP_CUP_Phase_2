@@ -1,0 +1,38 @@
+{
+  "total_samples": 5000,
+  "best_overall": {
+    "sample": "sample_04041",
+    "combined_score": 2.8848765360346724,
+    "sisdr": 16.91442108154297,
+    "stoi": 0.9497711658477783,
+    "pesq": 2.6370935440063477
+  },
+  "categories": {
+    "BEST MALE + NOISE": {
+      "sample": "sample_04041",
+      "combined_score": 2.8848765360346724,
+      "sisdr": 16.91442108154297,
+      "stoi": 0.9497711658477783,
+      "pesq": 2.6370935440063477
+    },
+    "BEST MALE + MUSIC": {
+      "sample": "sample_00750",
+      "combined_score": 2.744559928787215,
+      "sisdr": 13.458662033081055,
+      "stoi": 0.9561248421669006,
+      "pesq": 2.5371086597442627
+    },
+    "BEST MALE + FEMALE": {
+      "sample": "sample_01930",
+      "combined_score": 2.8014335673913178,
+      "sisdr": 12.957389831542969,
+      "stoi": 0.9594203233718872,
+      "pesq": 2.6399734020233154
+    }
+  },
+  "inference_stats": {
+    "avg_inference_ms": 50.55805403615814,
+    "std_inference_ms": 5.821734967961106,
+    "realtime_factor": 59.33772684080084
+  }
+}

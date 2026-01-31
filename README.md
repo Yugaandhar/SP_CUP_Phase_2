@@ -42,20 +42,22 @@ Install all dependencies using the requirements file:
 pip install -r requirements.txt
 ```
 
-Or install manually with **latest stable versions**:
+Or install manually with **stable versions** (avoiding torchcodec issues):
 
 ```bash
-pip install torch==2.10.0 torchaudio==2.10.0 torchmetrics==1.8.2 numpy==2.4.1 tqdm soundfile
+pip install torch==2.6.0 torchaudio==2.6.0 torchmetrics==1.8.2 numpy==2.4.1 tqdm soundfile pesq pystoi
 ```
 
 | Package | Version | Notes |
 |---------|---------|-------|
-| Python | >= 3.10 | Required (minimum for PyTorch 2.10) |
-| torch | 2.10.0 | Latest stable (Jan 2026) |
-| torchaudio | 2.10.0 | Audio I/O |
+| Python | >= 3.10 | Required |
+| torch | 2.6.0 | Stable (avoids torchcodec issues in 2.10+) |
+| torchaudio | 2.6.0 | Audio I/O |
 | torchmetrics | 1.8.2 | PESQ, STOI, SI-SDR metrics |
-| numpy | 2.4.1 | Latest stable (Jan 2026) |
+| numpy | 2.4.1 | Latest stable |
 | soundfile | latest | Audio I/O backend |
+| pesq | latest | Required for PESQ metric |
+| pystoi | latest | Required for STOI metric |
 | tqdm | latest | Progress bars |
 
 ### MATLAB (for dataset generation)
