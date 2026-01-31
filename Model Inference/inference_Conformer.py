@@ -1,5 +1,5 @@
 """
-DCCRN-Conformer Inference Script
+Conformer Inference Script
 Usage: python inference_Conformer.py --input mixture.wav --angle 45 --output output.wav
 """
 import argparse
@@ -10,7 +10,7 @@ import torchaudio
 import math
 
 # ==========================================
-# MODEL COMPONENTS (same as training)
+# MODEL COMPONENTS
 # ==========================================
 class ComplexConv2d(nn.Module):
     def __init__(self, in_ch, out_ch, kernel_size, stride=1, padding=0):

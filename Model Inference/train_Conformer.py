@@ -15,7 +15,7 @@ import math
 # ==========================================
 # 1. CONFIGURATION
 # ==========================================
-DATASET_ROOT = r"../Dataset/reverb_train" # or ../Dataset/anechoic_train
+DATASET_ROOT = r"../Train_Dataset/reverb" # or ../Train_Dataset/anechoic
 BATCH_SIZE = 4
 LEARNING_RATE = 1e-4  
 N_EPOCHS = 50         

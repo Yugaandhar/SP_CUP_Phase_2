@@ -21,7 +21,7 @@ OUTPUT_DIR = "evaluation_anechoic"   # or evaluations_anechoic
 SAMPLE_RATE = 16000
 N_FFT = 512
 HOP_LENGTH = 128
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cpu")
 
 # ==========================================
 # 2. MODEL COMPONENTS
